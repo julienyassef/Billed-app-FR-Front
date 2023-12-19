@@ -32,23 +32,25 @@ describe("Given I am connected as an employee", () => {
       //to-do write expect expression
     });
     test("Then bills should be ordered from earliest to latest", () => {
-      // un fonction de trie de date par ordre antiChrono, QUI FONCTIONNE
-      const antiChrono = (a, b) => (a > b ? 1 : -1);
-
-      // création de la page (headlessDOM)
-      document.body.innerHTML = BillsUI({ data: bills }); // des dates potentielement non triées
-      // récupère ce qu'il a affiché
+      // Fonction de tri par ordre chronologique
+      const chrono = (a, b) => new Date(a) - new Date(b);
+    
+      // Création de la page (headlessDOM)
+      document.body.innerHTML = BillsUI({ data: bills }); // Des dates potentiellement non triées
+    
+      // Récupération des dates affichées sur la page
       const dates = screen
         .getAllByText(
           /^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i
         )
         .map((a) => a.innerHTML);
-      // ["2001-02-13", "2001-05-13", "2001-12-13", "2001-01-13"]
-
-      // je trie mes dates en étant SUR
-      const datesSorted = [...dates].sort(antiChrono);
-
-      expect(dates).toEqual(datesSorted);
+    
+      // Tri des dates dans l'ordre chronologique
+      const datesSorted = [...dates].sort(chrono);
+    
+      // Vérification que les dates affichées sont triées de la plus ancienne à la plus récente
+      expect(dates).toEqual(datesSorted.reverse());
     });
+    
   });
 });
