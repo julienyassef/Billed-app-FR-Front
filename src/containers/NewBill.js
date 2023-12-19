@@ -15,11 +15,47 @@ export default class NewBill {
     this.billId = null
     new Logout({ document, localStorage, onNavigate })
   }
+
   handleChangeFile = e => {
     e.preventDefault()
-    const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-    const filePath = e.target.value.split(/\\/g)
-    const fileName = filePath[filePath.length-1]
+
+     // Obtenez une référence vers l'élément bouton et l'élément de message d'erreur
+    const chooseFileButton = document.getElementById('resetButtonErrorMessage');
+    const errorMessageElement = document.getElementById('error-message');
+
+    // Ajoutez un gestionnaire d'événements au clic sur le bouton
+    chooseFileButton.addEventListener('click', () => {
+      // Réinitialise le message d'erreur à une chaîne vide
+      errorMessageElement.textContent = '';
+    });
+
+    const fileInput = document.querySelector(`input[data-testid="file"]`);
+    const file = fileInput.files[0];
+
+  
+    // Liste des extensions de fichiers autorisées
+    const allowedExtensions = ['jpg', 'jpeg', 'png'];
+
+    // Obtient le nom du fichier et convertit toutes les lettres en minuscules
+    const fileName = file.name.toLowerCase();
+    console.log(fileName)
+
+    // Divise le nom du fichier en un tableau en utilisant le point (.) comme séparateur,
+    // puis récupère la dernière partie du tableau, qui représente l'extension du fichier
+    const fileExtension = fileName.split('.').pop();
+
+
+    if (!allowedExtensions.includes(fileExtension)) {
+      // Affiche le message d'erreur sur la page web
+      const errorMessageElement = document.getElementById('error-message');
+      errorMessageElement.textContent = 'Veuillez sélectionner un fichier avec une extension jpg, jpeg, ou png.';
+      
+      // Réinitialise le champ de fichier (facultatif)
+      fileInput.value = '';
+      return;
+    }
+
+
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
