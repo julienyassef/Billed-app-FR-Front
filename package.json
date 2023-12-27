@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "jest --coverage --noStackTrace --silent --coverage",
+    "test": "jest --coverage --noStackTrace --coverage",
     "start": "live-server",
     "start:cov": "cd coverage/lcov-report && live-server" 
   },
