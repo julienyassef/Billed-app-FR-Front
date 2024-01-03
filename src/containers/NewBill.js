@@ -38,8 +38,7 @@ export default class NewBill {
 
     // Obtient le nom du fichier et convertit toutes les lettres en minuscules
     const fileName = file.name.toLowerCase();
-    console.log(fileName)
-
+  
     // Divise le nom du fichier en un tableau en utilisant le point (.) comme séparateur,
     // puis récupère la dernière partie du tableau, qui représente l'extension du fichier
     const fileExtension = fileName.split('.').pop();
