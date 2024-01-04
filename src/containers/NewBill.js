@@ -49,29 +49,15 @@ export default class NewBill {
 
     // Vérifier si le format du fichier est valide
     if (!this.isValidFileFormat(file)) {
-      return false;
-    }
-
-    // Liste des extensions de fichiers autorisées
-    const allowedExtensions = ['jpg', 'jpeg', 'png'];
-
-    // Obtient le nom du fichier et convertit toutes les lettres en minuscules
-    const fileName = file.name.toLowerCase();
-  
-    // Divise le nom du fichier en un tableau en utilisant le point (.) comme séparateur,
-    // puis récupère la dernière partie du tableau, qui représente l'extension du fichier
-    const fileExtension = fileName.split('.').pop();
-
-
-    if (!allowedExtensions.includes(fileExtension)) {
       // Affiche le message d'erreur sur la page web
       const errorMessageElement = document.getElementById('error-message');
       errorMessageElement.textContent = 'Veuillez sélectionner un fichier avec une extension jpg, jpeg, ou png.';
       
       // Réinitialise le champ de fichier (facultatif)
       fileInput.value = '';
-      return;
+      return false
     }
+  
 
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
