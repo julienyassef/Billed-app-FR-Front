@@ -16,6 +16,21 @@ export default class NewBill {
     new Logout({ document, localStorage, onNavigate })
   }
 
+  isValidFileFormat(file) {
+    // Liste des extensions de fichiers autorisées
+    const allowedExtensions = ['jpg', 'jpeg', 'png'];
+
+    // Obtient le nom du fichier et convertit toutes les lettres en minuscules
+    const fileName = file.name.toLowerCase();
+  
+    // Divise le nom du fichier en un tableau en utilisant le point (.) comme séparateur,
+    // puis récupère la dernière partie du tableau, qui représente l'extension du fichier
+    const fileExtension = fileName.split('.').pop();
+
+    
+    return allowedExtensions.includes(fileExtension);
+  }
+
   handleChangeFile = e => {
     e.preventDefault()
 
@@ -32,7 +47,11 @@ export default class NewBill {
     const fileInput = document.querySelector(`input[data-testid="file"]`);
     const file = fileInput.files[0];
 
-  
+    // Vérifier si le format du fichier est valide
+    if (!this.isValidFileFormat(file)) {
+      return false;
+    }
+
     // Liste des extensions de fichiers autorisées
     const allowedExtensions = ['jpg', 'jpeg', 'png'];
 
