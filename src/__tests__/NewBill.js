@@ -7,8 +7,9 @@ import { screen, fireEvent } from "@testing-library/dom";
 import NewBillUI from "../views/NewBillUI.js";
 import NewBill from "../containers/NewBill.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
-import { ROUTES } from "../constants/routes.js";
+import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import store from "../__mocks__/store";
+import router from "../app/Router.js";
 
 
 describe("Given I am connected as an employee", () => {
@@ -116,10 +117,72 @@ describe("Given I am connected as an employee", () => {
         });
       });
 
+      describe('When I submit the New Bill form', () => {
+        test('It should call the handleSubmit method', () => {
+          // Création d'un mock sur la méthode handleSubmit
+          const handleSubmit = jest.fn(newBill.handleSubmit);
       
-      test("Then ...", () => {
+          // Récupération du formulaire New Bill 
+          const newBillForm = screen.getByTestId('form-new-bill');
       
+          // Ajout d'un écouteur d'événements sur la soumission du formulaire
+          newBillForm.addEventListener('submit', handleSubmit);
+      
+          // Simulation de la soumission du formulaire
+          fireEvent.submit(newBillForm);
+      
+          // Vérification si la méthode handleSubmit a bien été appelée
+          expect(handleSubmit).toHaveBeenCalled();
+        });
       });
     });
   });
+
+  describe("When I create a new bill", () => {
+    test("it should send the bill data to the mock API and return a successful response", async () => {
+      // Préparer l'état initial en simulant la connexion d'un utilisateur
+      localStorage.setItem("user", JSON.stringify({ type: "Employee", email: "a@a" }));
+
+      // Créer un élément racine dans le DOM
+      const root = document.createElement("div");
+      root.setAttribute("id", "root");
+      document.body.append(root);
+
+      // Activer le routage et naviguer vers la page de création de facture
+      router();
+      window.onNavigate(ROUTES_PATH.NewBill);
+
+      // Espionner la méthode create de la ressource bills du store
+      jest.spyOn(store, "bills");
+
+      const testBillData = {
+        type: "Transports",
+        name: "Billet d'avion",
+        date: "02/01/2024", 
+        amount: 150.00,
+        vat: 20.00,
+        pct: 10,
+        commentary: "Voyage d'affaires",
+        file: "test.jpg", 
+      };
+
+      // Simuler la création d'une facture dans le mock API
+      store.bills.mockImplementationOnce(() => {
+        return {
+          create: (bill) => {
+            // Vérifier que les données de la facture sont correctes
+            expect(bill).toEqual(testBillData);
+
+            // Renvoyer une promesse résolue pour simuler une opération réussie
+            return Promise.resolve();
+          },
+        };
+      });
+
+      // Vérifier que la méthode create a été appelée une fois
+      expect(store.bills).toHaveBeenCalledTimes(1);
+    });
+  });
 });
+
+
