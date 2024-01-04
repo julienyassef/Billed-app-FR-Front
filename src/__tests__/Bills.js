@@ -8,8 +8,10 @@ import { bills } from "../fixtures/bills.js";
 import { ROUTES_PATH, ROUTES } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import Bills from "../containers/Bills.js";
-
+import mockStore from "../__mocks__/store"
 import router from "../app/Router.js";
+
+jest.mock("../app/store", () => mockStore)
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -166,5 +168,66 @@ describe("Given I am connected as an employee", () => {
         expect($.fn.modal).toHaveBeenCalled()
       });
     });
+  });
+});
+
+// Test d'intégration : GET
+
+describe("When I navigate to Bills Page", () => {
+
+  test("I get bills from the API GET method", async () => {
+    // Espionnage de la méthode bills() du mockStore
+    const getSpy = jest.spyOn(mockStore, "bills");
+    
+    // Appel de la méthode list() pour récupérer les factures
+    const userBills = await mockStore.bills().list();
+
+    // Vérification que la méthode bills() a été appelée une fois
+    expect(getSpy).toHaveBeenCalledTimes(1);
+
+    // Vérification de la longueur des factures récupérées
+    expect(userBills.length).toBe(4);
+  });
+
+  test("API fetch fails with 404 error", async () => {
+    // Simulation d'une erreur 404 avec la méthode mockImplementationOnce()
+    mockStore.bills.mockImplementationOnce(() => {
+      return {
+        list: () => {
+          return Promise.reject(new Error("Erreur 404"));
+        }
+      };
+    });
+
+    // Mise en place de l'interface utilisateur avec le message d'erreur
+    const html = BillsUI({ error: "Erreur 404" });
+    document.body.innerHTML = html;
+
+    // Récupération du message d'erreur affiché à l'écran
+    const message = await screen.getByText(/Erreur 404/);
+
+    // Vérification que le message d'erreur est présent
+    expect(message).toBeTruthy();
+  });
+  
+  test("API fetch fails with 500 error", async () => {
+    // Simulation d'une erreur 500 avec la méthode mockImplementationOnce()
+    mockStore.bills.mockImplementationOnce(() => {
+      return {
+        list: () => {
+          return Promise.reject(new Error("Erreur 500"));
+        }
+      };
+    });
+
+    // Mise en place de l'interface utilisateur avec le message d'erreur
+    const html = BillsUI({ error: "Erreur 500" });
+    document.body.innerHTML = html;
+
+    // Récupération du message d'erreur affiché à l'écran
+    const message = await screen.getByText(/Erreur 500/);
+
+    // Vérification que le message d'erreur est présent
+    expect(message).toBeTruthy();
   });
 });
